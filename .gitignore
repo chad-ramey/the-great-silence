@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# OS / temp
+*.swp
+*.tmp
+*.log
+
+# Optional: keep private notes out of git by default.
+# Comment this out if you *want* to commit private notes.
+99-private/
