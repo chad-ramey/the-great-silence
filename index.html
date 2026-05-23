@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A transparent record of what the job application process looks like from the candidate's side. Every rejection, quoted directly. Every non-answer, counted.">
+  <title>The Great Silence: A Rejection Tracker</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --border: #e2e8f0;
+
+      --badge-form-color: #6366f1;
+      --badge-form-bg: #eef2ff;
+      --badge-closure-color: #d97706;
+      --badge-closure-bg: #fffbeb;
+      --badge-nofeedback-color: #dc2626;
+      --badge-nofeedback-bg: #fef2f2;
+      --badge-feedback-color: #059669;
+      --badge-feedback-bg: #ecfdf5;
+      --badge-na-color: #64748b;
+      --badge-na-bg: #f1f5f9;
+      --badge-filled-color: #7c3aed;
+      --badge-filled-bg: #f5f3ff;
+      --badge-ghost-color: #334155;
+      --badge-ghost-bg: #f1f5f9;
+
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ---- Header ---- */
+    header {
+      background: #0f172a;
+      background-image: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #0f172a 100%);
+      color: #f8fafc;
+      padding: 3.5rem 2rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,0.85) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,255,255,0.55) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,255,255,0.35) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,255,255,0.25) 1px, transparent 1px);
+      background-size: 220px 220px, 170px 170px, 280px 280px, 130px 130px;
+      background-position: 12px 18px, 95px 52px, 44px 110px, 160px 30px;
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .header-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #818cf8;
+      margin-bottom: 0.875rem;
+    }
+
+    h1 {
+      font-size: clamp(2.75rem, 7vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+      margin-bottom: 1rem;
+      color: #f8fafc;
+    }
+
+    .header-subtitle {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      max-width: 580px;
+      line-height: 1.65;
+      margin-bottom: 1.5rem;
+    }
+
+    .header-meta {
+      font-size: 0.82rem;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .header-meta .dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #475569;
+      display: inline-block;
+    }
+
+    /* ---- Main ---- */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ---- Stats ---- */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.25rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .stat-value {
+      font-size: 2.75rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    .stat-note {
+      font-size: 0.73rem;
+      color: var(--text-light);
+    }
+
+    .color-red    { color: #dc2626; }
+    .color-green  { color: #059669; }
+    .color-amber  { color: #d97706; }
+    .color-indigo { color: #6366f1; }
+
+    /* ---- Insight Banner ---- */
+    .insight-banner {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-left: 4px solid #dc2626;
+      border-radius: var(--radius);
+      padding: 1.125rem 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .insight-banner strong {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #991b1b;
+      margin-bottom: 0.3rem;
+    }
+
+    .insight-banner p {
+      font-size: 0.875rem;
+      color: #7f1d1d;
+      line-height: 1.6;
+    }
+
+    .insight-banner .highlight {
+      font-weight: 600;
+    }
+
+    /* ---- Section header ---- */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .section-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* ---- Filters ---- */
+    .filters-row {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .filter-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .filter-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.3rem 0.825rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.12s ease;
+      user-select: none;
+      white-space: nowrap;
+      line-height: 1.5;
+    }
+
+    .filter-pill:hover {
+      border-color: #6366f1;
+      color: #6366f1;
+      background: #eef2ff;
+    }
+
+    .filter-pill.active {
+      background: #6366f1;
+      border-color: #6366f1;
+      color: #fff;
+    }
+
+    .filter-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .sort-select {
+      padding: 0.3rem 0.75rem;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.12s ease;
+    }
+
+    .sort-select:focus {
+      border-color: #6366f1;
+      color: var(--text);
+    }
+
+    .result-count {
+      font-size: 0.78rem;
+      color: var(--text-light);
+      margin-bottom: 1.25rem;
+    }
+
+    /* ---- Cards ---- */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 3rem;
+    }
+
+    .rejection-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      border-left-width: 4px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.18s ease, transform 0.18s ease;
+    }
+
+    .rejection-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .rejection-card.type-form     { border-left-color: #6366f1; }
+    .rejection-card.type-closure  { border-left-color: #d97706; }
+    .rejection-card.type-filled   { border-left-color: #7c3aed; }
+    .rejection-card.type-ghost    { border-left-color: #94a3b8; background: #fafafa; }
+
+    .card-ghost-note {
+      margin: 0 1.25rem 1rem;
+      padding: 0.875rem 1rem;
+      background: #f1f5f9;
+      border-left: 3px solid #cbd5e1;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: 0.855rem;
+      color: #94a3b8;
+      font-style: italic;
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    .card-body {
+      padding: 1.25rem 1.25rem 0;
+    }
+
+    .card-company {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+      letter-spacing: -0.01em;
+    }
+
+    .card-role {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      line-height: 1.45;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      line-height: 1.5;
+    }
+
+    .badge-form        { background: var(--badge-form-bg);        color: var(--badge-form-color); }
+    .badge-closure     { background: var(--badge-closure-bg);     color: var(--badge-closure-color); }
+    .badge-filled      { background: var(--badge-filled-bg);      color: var(--badge-filled-color); }
+    .badge-ghost       { background: var(--badge-ghost-bg);       color: var(--badge-ghost-color); }
+    .badge-na          { background: var(--badge-na-bg);          color: var(--badge-na-color); }
+    .badge-feedback    { background: var(--badge-feedback-bg);    color: var(--badge-feedback-color); }
+    .badge-date        { background: #f1f5f9; color: #475569; }
+
+    .badge-nofeedback {
+      background: var(--badge-nofeedback-bg);
+      color: var(--badge-nofeedback-color);
+      padding: 0.25rem 0.7rem;
+      font-size: 0.72rem;
+    }
+
+    .badge-nofeedback::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #dc2626;
+      flex-shrink: 0;
+    }
+
+    .card-quote {
+      margin: 0 1.25rem 1rem;
+      padding: 0.875rem 1rem;
+      background: #f8fafc;
+      border-left: 3px solid #e2e8f0;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: 0.855rem;
+      color: #475569;
+      font-style: italic;
+      line-height: 1.65;
+    }
+
+    .card-insight {
+      margin: 0 1.25rem 1.25rem;
+      font-size: 0.81rem;
+      color: var(--text-light);
+      line-height: 1.55;
+    }
+
+    .card-tone {
+      padding: 0.875rem 1.25rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: auto;
+    }
+
+    .card-tone span {
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* ---- Timeline ---- */
+    .timeline-section {
+      margin-bottom: 3rem;
+    }
+
+    .timeline-container {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 2.5rem 1.75rem;
+      box-shadow: var(--shadow);
+    }
+
+    .timeline-track {
+      position: relative;
+      height: 290px;
+      min-width: 400px;
+    }
+
+    .timeline-line {
+      position: absolute;
+      top: 145px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--border);
+    }
+
+    .timeline-item {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      width: 120px;
+    }
+
+    /* Above the line: dot at bottom, content above */
+    .timeline-item.tl-above {
+      flex-direction: column-reverse;
+      top: auto;
+      bottom: calc(50% - 10px); /* dot bottom = 50% + 10px, center = 50% ✓ */
+    }
+
+    .timeline-item.tl-above .timeline-content {
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+    }
+
+    /* Below the line: dot at top, content below */
+    .timeline-item.tl-below {
+      flex-direction: column;
+      top: calc(50% - 10px); /* dot top = 50% - 10px, center = 50% ✓ */
+    }
+
+    .timeline-item.tl-below .timeline-content {
+      margin-top: 0.75rem;
+    }
+
+    .timeline-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      flex-shrink: 0;
+      z-index: 1;
+      box-shadow: 0 0 0 2px currentColor;
+    }
+
+    .timeline-dot.type-form    { background: #6366f1; color: #6366f1; }
+    .timeline-dot.type-closure { background: #d97706; color: #d97706; }
+    .timeline-dot.type-filled  { background: #7c3aed; color: #7c3aed; }
+    .timeline-dot.type-ghost   { background: #94a3b8; color: #94a3b8; }
+
+    .timeline-content {
+      text-align: center;
+    }
+
+    .timeline-date {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 0.25rem;
+    }
+
+    .timeline-company {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+
+    .timeline-role-type {
+      font-size: 0.7rem;
+      color: var(--text-light);
+    }
+
+    .timeline-legend {
+      display: flex;
+      gap: 1.25rem;
+      margin-top: 1.5rem;
+      font-size: 0.77rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .legend-dot.form    { background: #6366f1; }
+    .legend-dot.closure { background: #d97706; }
+    .legend-dot.filled  { background: #7c3aed; }
+
+    .timeline-note {
+      margin-top: 1rem;
+      font-size: 0.78rem;
+      color: var(--text-light);
+      line-height: 1.55;
+    }
+
+    /* ---- Footer ---- */
+    footer {
+      background: #0f172a;
+      color: #475569;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    footer p {
+      font-size: 0.83rem;
+      line-height: 1.7;
+    }
+
+    footer p + p {
+      margin-top: 0.375rem;
+    }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      header { padding: 2.25rem 1.25rem 2.25rem; }
+      main { padding: 1.5rem 1rem 3rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .stat-value { font-size: 2.25rem; }
+      .filters-row { gap: 0.5rem; }
+      .timeline-container { padding: 1.5rem 1.25rem 1.5rem; overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="header-eyebrow">A Transparent Record</div>
+      <h1>The Great Silence</h1>
+      <p class="header-subtitle">
+        Documenting what the hiring process looks like from the other side. Every rejection, quoted directly. Every non-answer, counted.
+      </p>
+      <div class="header-meta">
+        <span>13 applications tracked</span>
+        <span class="dot"></span>
+        <span>Updated May 22, 2026</span>
+        <span class="dot"></span>
+        <span>IT and Engineering roles</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="stats-grid" id="stats-grid"></div>
+
+    <div class="insight-banner">
+      <strong>1 in 13 applications received meaningful feedback. 5 closed without sending a single email.</strong>
+      <p>
+        One recruiter at <span class="highlight">Netflix</span> sent a personal note with real context. Five roles marked "no longer accepting applications" sent nothing at all. The rest sent a form email or an automated system message. That <span class="highlight">7.7%</span> feedback rate is the whole story.
+      </p>
+    </div>
+
+    <div class="section-header">
+      <span class="section-title">All Rejections</span>
+      <select class="sort-select" id="sort-select" aria-label="Sort rejections">
+        <option value="date-desc">Date: Newest first</option>
+        <option value="date-asc">Date: Oldest first</option>
+        <option value="company">Company: A to Z</option>
+        <option value="type">By type</option>
+      </select>
+    </div>
+
+    <div class="filters-row" role="group" aria-label="Filter rejections">
+      <span class="filter-label">Type</span>
+      <button class="filter-pill active" data-filter="type" data-value="all">All</button>
+      <button class="filter-pill" data-filter="type" data-value="form">Form Rejection</button>
+      <button class="filter-pill" data-filter="type" data-value="closure">Role Closure</button>
+      <button class="filter-pill" data-filter="type" data-value="filled">Role Filled</button>
+      <button class="filter-pill" data-filter="type" data-value="ghost">No Response</button>
+      <div class="filter-divider" aria-hidden="true"></div>
+      <span class="filter-label">Feedback</span>
+      <button class="filter-pill active" data-filter="feedback" data-value="all">All</button>
+      <button class="filter-pill" data-filter="feedback" data-value="none">No Feedback</button>
+      <button class="filter-pill" data-filter="feedback" data-value="given">Feedback Given</button>
+    </div>
+
+    <div class="result-count" id="result-count" aria-live="polite"></div>
+
+    <div class="cards-grid" id="cards-grid"></div>
+
+    <div class="timeline-section">
+      <div class="section-header">
+        <span class="section-title">
+          Timeline
+          <span style="font-weight: 500; color: var(--text-muted); font-size: 0.9em;">(dated entries only)</span>
+        </span>
+      </div>
+      <div class="timeline-container">
+        <div class="timeline-track" id="timeline-track">
+          <div class="timeline-line"></div>
+        </div>
+        <div class="timeline-legend">
+          <div class="legend-item"><div class="legend-dot form"></div> Form Rejection</div>
+          <div class="legend-item"><div class="legend-dot closure"></div> Role Closure</div>
+          <div class="legend-item"><div class="legend-dot filled"></div> Role Filled</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#94a3b8;"></div> No Response (not shown, no email date)</div>
+        </div>
+        <p class="timeline-note">
+          7 entries have no date shown: 2 rejection emails with no recorded date, and 5 applications that closed without sending one. The undated are the point.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <p>Built because transparency in hiring should not be a differentiator. It should be the floor.</p>
+      <p>All quotes are taken directly from rejection emails. Company names are accurate.</p>
+    </div>
+  </footer>
+
+  <script>
+    const rejections = [
+      {
+        id: 1,
+        company: "Anthropic",
+        role: "IT Systems Engineer, Enterprise SaaS",
+        date: "2026-04-21",
+        dateDisplay: "April 21, 2026",
+        tone: "Warm, detailed",
+        feedback: false,
+        type: "form",
+        typeLabel: "Form Rejection",
+        quote: "Unfortunately, we cannot provide more detailed feedback, but the most common reason we do not move forward with a candidate is not seeing enough experience that appears relevant to our needs.",
+        insight: "Sent from no-reply@appreview.gem.com (Gem ATS). The most detailed rejection in this batch. The feedback is 'the most common reason,' a template answer that tells every candidate the same thing. That is not feedback. That is a form with extra steps."
+      },
+      {
+        id: 2,
+        company: "Ashby",
+        role: "Staff IT Engineer",
+        date: "2026-05-12",
+        dateDisplay: "May 12, 2026",
+        tone: "Apologetic",
+        feedback: false,
+        type: "form",
+        typeLabel: "Form Rejection",
+        quote: "We've reviewed your background and right now we don't see an ideal fit for this position. I'm sorry that we cannot provide more detailed feedback, but we have had a high applicant volume and a small team to review them.",
+        insight: "They actually gave a reason for no feedback: high volume, small team. That is more than most. Still no feedback on the actual application, but points for honesty about the system."
+      },
+      {
+        id: 3,
+        company: "Aledade",
+        role: "Sr IT Operations Engineer",
+        date: "2026-05-18",
+        dateDisplay: "May 18, 2026",
+        tone: "Professional",
+        feedback: null,
+        type: "closure",
+        typeLabel: "Role Closure",
+        quote: "Unfortunately, we won't be moving forward with interviews at this time because the position is now closed.",
+        insight: "Sent from no-reply@hire.lever.co (same Lever ATS as Lyra Health). The email gives no reason for the closure. The word 'reprioritization' does not appear anywhere in it."
+      },
+      {
+        id: 4,
+        company: "Netflix",
+        role: "Technology Experience Domain Specialist",
+        date: "2026-05-19",
+        dateDisplay: "May 19, 2026",
+        tone: "Personal, specific",
+        feedback: true,
+        type: "closure",
+        typeLabel: "Role Closure",
+        quote: "A quick update - I wanted to let you know that we recently closed this role due to hiring reprioritization. Therefore it is no longer open for the foreseeable future. I would love to reach back out if the team decides to re-open the role.",
+        insight: "A call had been scheduled before the role was closed. Tracey Kim cancelled it personally, explained what happened, and offered to reconnect. Named the situation. Said something human. This is the standard, not the exception."
+      },
+      {
+        id: 5,
+        company: "USPS",
+        role: "Mail Handler Assistant, Madison WI P&DC",
+        date: "2026-05-22",
+        dateDisplay: "May 22, 2026",
+        tone: "System notification",
+        feedback: false,
+        type: "closure",
+        typeLabel: "Role Closure",
+        quote: "This job posting has been closed or cancelled.",
+        insight: "Subject line: 'You Are No Longer Being Considered for this Position.' Sent from recruiting@recruiting.usps.gov via Avature, a government ATS. The footer reads: 'This is an automated email, please do not reply to this message.' At least they said it out loud."
+      },
+      {
+        id: 6,
+        company: "Phantom",
+        role: "Senior Application Engineer, IT Engineering",
+        date: "2026-05-22",
+        dateDisplay: "May 22, 2026",
+        tone: "Warm",
+        feedback: null,
+        type: "closure",
+        typeLabel: "Role Closure",
+        quote: "At this time, the position has been closed and is no longer open for recruitment. We understand this may be disappointing news, and we truly value your interest in joining our team.",
+        insight: "Sent via no-reply@ashbyhq.com, the same platform Ashby used to reject a separate application 10 days earlier. Arrived at 4:30 PM. USPS arrived 18 minutes later. Three rejections landed on May 22."
+      },
+      {
+        id: 8,
+        company: "Attentive",
+        role: "Senior IT Engineer",
+        date: "2026-04-30",
+        dateDisplay: "April 30, 2026",
+        tone: "Warm, enthusiastic",
+        feedback: false,
+        type: "filled",
+        typeLabel: "Role Filled",
+        quote: "Unfortunately, we just recently filled the role. Apologies that timing didn't work out.",
+        insight: "Opens with 'You have some awesome experience!' and closes with a rejection. Sent from no-reply@us.greenhouse-mail.io (Greenhouse ATS). The role was actually filled. Someone else got the job. That is the most ordinary hiring outcome, and the only one of its kind in this dataset."
+      },
+      {
+        id: 9,
+        company: "Pinterest",
+        role: "Staff Collaboration Systems Engineer, Google Workspace",
+        date: null,
+        dateDisplay: "~May 2, 2026",
+        tone: "N/A",
+        feedback: false,
+        type: "ghost",
+        typeLabel: "No Response",
+        quote: null,
+        insight: "Applied 3 weeks ago. Role is no longer accepting applications. No email, no rejection, no record of any decision. Pinterest posted the same role for Chicago. Applied to that one too. Both went quiet."
+      },
+      {
+        id: 10,
+        company: "Pinterest",
+        role: "Staff Collaboration Systems Engineer, Google Workspace (Chicago)",
+        date: null,
+        dateDisplay: "~May 9, 2026",
+        tone: "N/A",
+        feedback: false,
+        type: "ghost",
+        typeLabel: "No Response",
+        quote: null,
+        insight: "Applied 2 weeks ago, Chicago location. No longer accepting applications. No email sent. The US Remote posting also went silent. Two applications to the same role, two non-responses."
+      },
+      {
+        id: 11,
+        company: "Vaco by Highspring",
+        role: "Google Workspace Engineer",
+        date: null,
+        dateDisplay: "~April 25, 2026",
+        tone: "N/A",
+        feedback: false,
+        type: "ghost",
+        typeLabel: "No Response",
+        quote: null,
+        insight: "Applied 4 weeks ago. The oldest unacknowledged application in this dataset. Role is no longer accepting applications. Four weeks of silence from a company that presumably made a hiring decision."
+      },
+      {
+        id: 12,
+        company: "Crossing Hurdles",
+        role: "Slack Administrator",
+        date: null,
+        dateDisplay: "~May 9, 2026",
+        tone: "N/A",
+        feedback: false,
+        type: "ghost",
+        typeLabel: "No Response",
+        quote: null,
+        insight: "Applied 2 weeks ago. No longer accepting applications. The same role was reposted. Applied to that listing as well. Neither has received any acknowledgment."
+      },
+      {
+        id: 13,
+        company: "Cursor-ASHBY",
+        role: "Technical Support Engineer, AMER",
+        date: null,
+        dateDisplay: "~May 9, 2026",
+        tone: "N/A",
+        feedback: false,
+        type: "ghost",
+        typeLabel: "No Response",
+        quote: null,
+        insight: "Applied 2 weeks ago. No longer accepting applications. The role was listed twice on LinkedIn. Applied to both entries. No response from either."
+      },
+      {
+        id: 7,
+        company: "Lyra Health",
+        role: "Google Workspace and DLP Specialist",
+        date: "2026-05-22",
+        dateDisplay: "May 22, 2026",
+        tone: "Brief, appreciative",
+        feedback: false,
+        type: "form",
+        typeLabel: "Form Rejection",
+        quote: "After reviewing your application, we have made the decision to not move forward at this time. We greatly appreciate the interest that you have shown in Lyra Health and the time you have invested in this application.",
+        insight: "Sent from no-reply@hire.lever.co. The Lever ATS system delivered this. Two sentences. No reason. Technically signed by the Recruiting Team, but no person wrote it."
+      }
+    ];
+
+    let typeFilter = 'all';
+    let feedbackFilter = 'all';
+    let sortBy = 'date-desc';
+
+    function computeStats() {
+      const total          = rejections.length;
+      const withFeedback   = rejections.filter(r => r.feedback === true).length;
+      const noFeedback     = rejections.filter(r => r.feedback === false).length;
+      const ghost          = rejections.filter(r => r.type === 'ghost').length;
+      const closures       = rejections.filter(r => r.type === 'closure').length;
+      const filled         = rejections.filter(r => r.type === 'filled').length;
+      const formRejections = rejections.filter(r => r.type === 'form').length;
+      const feedbackPct    = Math.round((withFeedback / total) * 10) / 10;
+      return { total, withFeedback, noFeedback, ghost, closures, filled, formRejections, feedbackPct };
+    }
+
+    function renderStats() {
+      const { total, withFeedback, noFeedback, ghost, closures, filled, formRejections, feedbackPct } = computeStats();
+      document.getElementById('stats-grid').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-value color-indigo">${total}</div>
+          <div class="stat-label">Applications Tracked</div>
+          <div class="stat-note">All roles, all outcomes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value color-red" style="font-size:2rem;">${ghost}</div>
+          <div class="stat-label">No Email Sent</div>
+          <div class="stat-note">Role closed, zero communication</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value color-red">${noFeedback}</div>
+          <div class="stat-label">Zero Feedback</div>
+          <div class="stat-note">${Math.round((noFeedback / total) * 100)}% of applications</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value color-green">${withFeedback}</div>
+          <div class="stat-label">Meaningful Feedback</div>
+          <div class="stat-note">${feedbackPct}% feedback rate</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value color-amber">${closures}</div>
+          <div class="stat-label">Role Closures</div>
+          <div class="stat-note">${filled} filled &nbsp;·&nbsp; ${formRejections} form rejections</div>
+        </div>
+      `;
+    }
+
+    function getFiltered() {
+      let result = [...rejections];
+
+      if (typeFilter !== 'all') {
+        result = result.filter(r => r.type === typeFilter);
+      }
+      if (feedbackFilter === 'none') {
+        result = result.filter(r => r.feedback === false);
+      } else if (feedbackFilter === 'given') {
+        result = result.filter(r => r.feedback === true);
+      }
+
+      const dateSortValue = r => r.date ? r.date : (sortBy === 'date-desc' ? '0000' : '9999');
+
+      if (sortBy === 'company') {
+        result.sort((a, b) => a.company.localeCompare(b.company));
+      } else if (sortBy === 'type') {
+        result.sort((a, b) => a.typeLabel.localeCompare(b.typeLabel) || a.company.localeCompare(b.company));
+      } else if (sortBy === 'date-desc') {
+        result.sort((a, b) => dateSortValue(b).localeCompare(dateSortValue(a)));
+      } else {
+        result.sort((a, b) => dateSortValue(a).localeCompare(dateSortValue(b)));
+      }
+
+      return result;
+    }
+
+    function feedbackBadge(feedback) {
+      if (feedback === true)  return `<span class="badge badge-feedback">Feedback given</span>`;
+      if (feedback === false) return `<span class="badge badge-nofeedback">No feedback</span>`;
+      return `<span class="badge badge-na">N/A</span>`;
+    }
+
+    function typeBadge(type, label) {
+      return `<span class="badge badge-${type}">${label}</span>`;
+    }
+
+    function renderCards() {
+      const filtered = getFiltered();
+      const grid  = document.getElementById('cards-grid');
+      const count = document.getElementById('result-count');
+
+      count.textContent = `Showing ${filtered.length} of ${rejections.length} rejections`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state"><p>No rejections match these filters. Which would be great news in a different context.</p></div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(r => `
+        <article class="rejection-card type-${r.type}">
+          <div class="card-body">
+            <div class="card-company">${r.company}</div>
+            <div class="card-role">${r.role}</div>
+            <div class="badges">
+              ${typeBadge(r.type, r.typeLabel)}
+              ${feedbackBadge(r.feedback)}
+              <span class="badge badge-date">${r.dateDisplay}</span>
+            </div>
+          </div>
+          ${r.type === 'ghost'
+            ? `<p class="card-ghost-note">No email received. The application closed without a word.</p>`
+            : `<blockquote class="card-quote">&ldquo;${r.quote}&rdquo;</blockquote>`
+          }
+          <p class="card-insight">${r.insight}</p>
+          <div class="card-tone">${r.type === 'ghost' ? 'No communication received' : `Email tone: <span>${r.tone}</span>`}</div>
+        </article>
+      `).join('');
+    }
+
+    function renderTimeline() {
+      const dated = rejections
+        .filter(r => r.date)
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+      if (dated.length < 2) return;
+
+      const track = document.getElementById('timeline-track');
+
+      // Equal spacing: proportional would cluster the May entries into <15% of the width.
+      // Dates are shown in labels so chronological info is preserved.
+      dated.forEach((r, i) => {
+        const leftPct = dated.length > 1 ? 7 + (i / (dated.length - 1)) * 86 : 50;
+        const side    = i % 2 === 0 ? 'tl-above' : 'tl-below';
+
+        const item = document.createElement('div');
+        item.className = `timeline-item ${side}`;
+        item.style.left      = leftPct + '%';
+        item.style.transform = 'translateX(-50%)';
+
+        item.innerHTML = `
+          <div class="timeline-dot type-${r.type}"></div>
+          <div class="timeline-content">
+            <div class="timeline-date">${r.dateDisplay}</div>
+            <div class="timeline-company">${r.company}</div>
+            <div class="timeline-role-type">${r.typeLabel}</div>
+          </div>
+        `;
+        track.appendChild(item);
+      });
+    }
+
+    function setupInteractions() {
+      document.querySelectorAll('.filter-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const filterType = btn.dataset.filter;
+          const value      = btn.dataset.value;
+
+          document.querySelectorAll(`[data-filter="${filterType}"]`).forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          if (filterType === 'type')     typeFilter     = value;
+          if (filterType === 'feedback') feedbackFilter = value;
+
+          renderCards();
+        });
+      });
+
+      document.getElementById('sort-select').addEventListener('change', e => {
+        sortBy = e.target.value;
+        renderCards();
+      });
+    }
+
+    renderStats();
+    renderCards();
+    renderTimeline();
+    setupInteractions();
+  </script>
+
+</body>
+</html>
