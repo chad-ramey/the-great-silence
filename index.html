@@ -612,9 +612,9 @@
         Documenting what the hiring process looks like from the other side. Every rejection, quoted directly. Every non-answer, counted.
       </p>
       <div class="header-meta">
-        <span>14 applications tracked</span>
+        <span>20 applications tracked</span>
         <span class="dot"></span>
-        <span>Updated May 24, 2026</span>
+        <span>Updated June 4, 2026</span>
         <span class="dot"></span>
         <span>IT and Engineering roles</span>
       </div>
@@ -625,9 +625,9 @@
     <div class="stats-grid" id="stats-grid"></div>
 
     <div class="insight-banner">
-      <strong>1 in 14 applications received meaningful feedback. 5 closed without sending a single email.</strong>
+      <strong>1 in 20 applications received meaningful feedback. 5 closed without sending a single email.</strong>
       <p>
-        One recruiter at <span class="highlight">Netflix</span> sent a personal note with real context. Five roles marked "no longer accepting applications" sent nothing at all. The rest sent a form email or an automated system message. That <span class="highlight">7.1%</span> feedback rate is the whole story.
+        One recruiter at <span class="highlight">Netflix</span> sent a personal note with real context. Five roles closed without any communication. One company explicitly refused feedback to protect "the integrity of the hiring process." The rest sent form emails or automated system notifications. That <span class="highlight">5%</span> feedback rate is the whole story.
       </p>
     </div>
 
@@ -692,6 +692,84 @@
 
   <script>
     const rejections = [
+      {
+        id: 15,
+        company: "Epic",
+        role: "Entry Level Global Operations Center Technician",
+        date: "2026-06-03",
+        dateDisplay: "June 3, 2026",
+        tone: "Professional, then closed",
+        feedback: false,
+        type: "form",
+        typeLabel: "Form Rejection",
+        quote: "After careful consideration we've decided to move forward with other candidates.",
+        insight: "Chad asked Jess Cagle for specific feedback. Epic replied that providing individual feedback would be unfair to other applicants and would compromise the integrity of the hiring process. Fairness as a reason to tell everyone nothing."
+      },
+      {
+        id: 16,
+        company: "CoreWeave",
+        role: "Staff Systems Engineer (Architect)",
+        date: "2026-06-04",
+        dateDisplay: "June 4, 2026",
+        tone: "Personal, warm",
+        feedback: false,
+        type: "form",
+        typeLabel: "Form Rejection",
+        quote: "After careful consideration, we've decided to move forward with other candidates at this time. The process was highly competitive, and this was not an easy decision.",
+        insight: "Came in via referral. Had an actual conversation with the team. Melissa Simpson sent this from her own email address, not an ATS. Still no specific feedback about the role or the fit. 'Highly competitive' and 'not an easy decision' are doing all the work."
+      },
+      {
+        id: 17,
+        company: "Bass Pro Shops",
+        role: "Greeter Part Time",
+        date: "2026-06-04",
+        dateDisplay: "June 4, 2026",
+        tone: "Professional",
+        feedback: false,
+        type: "form",
+        typeLabel: "Form Rejection",
+        quote: "We regret to inform you that we have decided not to move forward at this time.",
+        insight: "Sent at 2:08 AM via Workday. Bass Pro then asked candidates to complete a survey rating their hiring experience. The survey link was the most specific communication in the entire email."
+      },
+      {
+        id: 18,
+        company: "Bass Pro Shops",
+        role: "CLUB Customer Service Outfitter",
+        date: "2026-06-04",
+        dateDisplay: "June 4, 2026",
+        tone: "Professional",
+        feedback: false,
+        type: "form",
+        typeLabel: "Form Rejection",
+        quote: "We regret to inform you that we have decided not to move forward at this time.",
+        insight: "A second rejection from Bass Pro at the exact same timestamp: 2:08 AM. Same template, different role title. The system processed both simultaneously in the middle of the night."
+      },
+      {
+        id: 19,
+        company: "CrowdStrike",
+        role: "Sr. Slack Platform Engineer, Enterprise Collaboration",
+        date: "2026-06-04",
+        dateDisplay: "June 4, 2026",
+        tone: "Automated system notification",
+        feedback: false,
+        type: "form",
+        typeLabel: "Form Rejection",
+        quote: "Although we have decided to move forward with other candidates, we truly appreciate the time and effort you invested in applying for the position.",
+        insight: "The email labels itself 'WORKDAY SYSTEM NOTIFICATION' in bold at the top. That level of self-identification is unusual. At least it is honest about what it is."
+      },
+      {
+        id: 20,
+        company: "Life360",
+        role: "Senior IT Automation Engineer II",
+        date: "2026-06-03",
+        dateDisplay: "June 3, 2026",
+        tone: "Personal, considerate",
+        feedback: null,
+        type: "closure",
+        typeLabel: "Role Closure",
+        quote: "I wanted to reach out personally to let you know that we've made the decision to pause this search for the time being. The role has been cancelled, and we are no longer moving forward with the hiring process.",
+        insight: "Dan Spencer wrote this himself. Used 'pause' rather than 'closed forever.' Offered to circle back if things change. Sent from Greenhouse but signed by a person. The second human-written closure in this dataset, after Tracey Kim at Netflix."
+      },
       {
         id: 14,
         company: "Monarch Money",
