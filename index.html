@@ -168,30 +168,28 @@
     .color-indigo { color: #6366f1; }
 
     /* ---- Insight Banner ---- */
-    .insight-banner {
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      border-left: 4px solid #dc2626;
+    .narrative-section {
+      background: var(--card);
+      border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 1.125rem 1.5rem;
+      padding: 1.75rem 2rem;
       margin-bottom: 2rem;
+      box-shadow: var(--shadow);
     }
 
-    .insight-banner strong {
-      display: block;
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #991b1b;
-      margin-bottom: 0.3rem;
+    .narrative-section p {
+      font-size: 0.925rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+      max-width: 780px;
     }
 
-    .insight-banner p {
-      font-size: 0.875rem;
-      color: #7f1d1d;
-      line-height: 1.6;
+    .narrative-section p + p {
+      margin-top: 0.875rem;
     }
 
-    .insight-banner .highlight {
+    .narrative-section strong {
+      color: var(--text);
       font-weight: 600;
     }
 
@@ -606,10 +604,10 @@
 
   <header>
     <div class="header-inner">
-      <div class="header-eyebrow">A Transparent Record</div>
+      <div class="header-eyebrow">A Job Search, Documented</div>
       <h1>The Great Silence</h1>
       <p class="header-subtitle">
-        Documenting what the hiring process looks like from the other side. Every rejection, quoted directly. Every non-answer, counted.
+        Every application tracked. Every outcome recorded. Understanding the patterns is how you stop taking the silence personally.
       </p>
       <div class="header-meta">
         <span>18 applications tracked</span>
@@ -624,11 +622,10 @@
   <main>
     <div class="stats-grid" id="stats-grid"></div>
 
-    <div class="insight-banner">
-      <strong>1 in 18 applications received meaningful feedback. 5 closed without sending a single email.</strong>
-      <p>
-        One recruiter at <span class="highlight">Netflix</span> sent a personal note with real context. Five roles closed without any communication. One company explicitly refused feedback to protect "the integrity of the hiring process." The rest sent form emails or automated system notifications. That <span class="highlight">5%</span> feedback rate is the whole story.
-      </p>
+    <div class="narrative-section">
+      <p>Most of the outcomes here were not decisions about a person. Five roles closed before any evaluation took place. Several more were filled by candidates already in process before this search began. That is market timing and volatility, not a skills assessment.</p>
+      <p>Two recruiters — <strong>Tracey Kim at Netflix</strong> and <strong>Dan Spencer at Life360</strong> — wrote something specific and human. What they said, how briefly they said it, and what they offered next is the benchmark the rest of the data is measured against. It cost them maybe two minutes.</p>
+      <p>Tracking this removes the guesswork. When you can see the patterns clearly, you can stop waiting on the silence and start building your own signal. The search continues.</p>
     </div>
 
     <div class="section-header">
@@ -685,8 +682,8 @@
 
   <footer>
     <div class="footer-inner">
-      <p>Built because transparency in hiring should not be a differentiator. It should be the floor.</p>
-      <p>All quotes are taken directly from rejection emails. Company names are accurate.</p>
+      <p>The job market is opaque by design. Tracking it is the workaround.</p>
+      <p>All quotes are taken directly from rejection emails. Company names are accurate. The search continues.</p>
     </div>
   </footer>
 
