@@ -30,6 +30,8 @@
       --badge-filled-bg: #f5f3ff;
       --badge-ghost-color: #334155;
       --badge-ghost-bg: #f1f5f9;
+      --badge-active-color: #059669;
+      --badge-active-bg: #dcfce7;
 
       --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
       --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
@@ -314,6 +316,20 @@
     .rejection-card.type-closure  { border-left-color: #d97706; }
     .rejection-card.type-filled   { border-left-color: #7c3aed; }
     .rejection-card.type-ghost    { border-left-color: #94a3b8; background: #fafafa; }
+    .rejection-card.type-active   { border-left-color: #059669; background: #f0fdf4; }
+
+    .card-active-note {
+      margin: 0 1.25rem 1rem;
+      padding: 0.875rem 1rem;
+      background: #f0fdf4;
+      border-left: 3px solid #86efac;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: 0.855rem;
+      color: #166534;
+      font-style: italic;
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
 
     .card-ghost-note {
       margin: 0 1.25rem 1rem;
@@ -372,6 +388,7 @@
     .badge-filled      { background: var(--badge-filled-bg);      color: var(--badge-filled-color); }
     .badge-ghost       { background: var(--badge-ghost-bg);       color: var(--badge-ghost-color); }
     .badge-na          { background: var(--badge-na-bg);          color: var(--badge-na-color); }
+    .badge-active      { background: var(--badge-active-bg);     color: var(--badge-active-color); }
     .badge-feedback    { background: var(--badge-feedback-bg);    color: var(--badge-feedback-color); }
     .badge-date        { background: #f1f5f9; color: #475569; }
 
@@ -503,6 +520,7 @@
     .timeline-dot.type-closure { background: #d97706; color: #d97706; }
     .timeline-dot.type-filled  { background: #7c3aed; color: #7c3aed; }
     .timeline-dot.type-ghost   { background: #94a3b8; color: #94a3b8; }
+    .timeline-dot.type-active  { background: #059669; color: #059669; }
 
     .timeline-content {
       text-align: center;
@@ -610,7 +628,7 @@
         Every application tracked. Every outcome recorded. Understanding the patterns is how you stop taking the silence personally.
       </p>
       <div class="header-meta">
-        <span>27 applications tracked</span>
+        <span>29 applications tracked</span>
         <span class="dot"></span>
         <span>Updated June 7, 2026</span>
         <span class="dot"></span>
@@ -645,6 +663,7 @@
       <button class="filter-pill" data-filter="type" data-value="closure">Role Closure</button>
       <button class="filter-pill" data-filter="type" data-value="filled">Role Filled</button>
       <button class="filter-pill" data-filter="type" data-value="ghost">No Response</button>
+      <button class="filter-pill" data-filter="type" data-value="active">In Progress</button>
       <div class="filter-divider" aria-hidden="true"></div>
       <span class="filter-label">Feedback</span>
       <button class="filter-pill active" data-filter="feedback" data-value="all">All</button>
@@ -672,9 +691,10 @@
           <div class="legend-item"><div class="legend-dot closure"></div> Role Closure</div>
           <div class="legend-item"><div class="legend-dot filled"></div> Role Filled</div>
           <div class="legend-item"><div class="legend-dot" style="background:#94a3b8;"></div> No Response (not shown, no email date)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#059669;"></div> In Progress (not shown, no outcome date)</div>
         </div>
         <p class="timeline-note">
-          15 entries have no date shown: 2 rejection emails with no recorded date, and 13 applications that went silent without sending one. The undated are the point.
+          17 entries have no date shown: 2 rejection emails with no recorded date, 12 applications that went silent without sending one, and 3 currently in progress. The undated are the point.
         </p>
       </div>
     </div>
@@ -1022,10 +1042,39 @@
         dateDisplay: "~May 24, 2026",
         tone: "N/A",
         feedback: false,
-        type: "ghost",
-        typeLabel: "No Response",
+        type: "active",
+        typeLabel: "In Progress",
         quote: null,
-        insight: "Applied 2 weeks ago. The role was reposted around the same time the application was submitted, suggesting the original listing had already expired. No response received from either posting."
+        activeNote: "Introductory recruiting call scheduled June 17, 2026 at 2:00 PM with Kayla Stiers.",
+        insight: "Applied 2 weeks ago. Kayla Stiers reached out June 10 to schedule an introductory call. The role had been reposted around the time of the original application. First active callback in this dataset."
+      },
+      {
+        id: 30,
+        company: "Riot Games",
+        role: "Google Workspace Application Engineer II",
+        date: null,
+        dateDisplay: "June 10, 2026",
+        tone: "N/A",
+        feedback: false,
+        type: "active",
+        typeLabel: "In Progress",
+        quote: null,
+        activeNote: "Recruiter call June 10, 2026 at 1:00 PM with Allison Jones at IDR Inc.",
+        insight: "Contract role through December 2026, $66-85/hour, remote (PST hours). Came in as a referral from Tim Rayburn, who forwarded the role from recruiter Allison Jones at IDR Inc. and referred Chad directly. Two-interview process: manager round on collaboration platforms, then a technical Google Workspace round. GAM experience required."
+      },
+      {
+        id: 31,
+        company: "Uber",
+        role: "IT/Technology Role",
+        date: null,
+        dateDisplay: "~May 2026",
+        tone: "N/A",
+        feedback: false,
+        type: "active",
+        typeLabel: "In Progress",
+        quote: null,
+        activeNote: "Second interview scheduled June 11, 2026.",
+        insight: "The furthest any application in this dataset has progressed. Second interview scheduled for June 11. Role details to be confirmed."
       },
       {
         id: 7,
@@ -1051,15 +1100,16 @@
       const withFeedback   = rejections.filter(r => r.feedback === true).length;
       const noFeedback     = rejections.filter(r => r.feedback === false).length;
       const ghost          = rejections.filter(r => r.type === 'ghost').length;
+      const active         = rejections.filter(r => r.type === 'active').length;
       const closures       = rejections.filter(r => r.type === 'closure').length;
       const filled         = rejections.filter(r => r.type === 'filled').length;
       const formRejections = rejections.filter(r => r.type === 'form').length;
       const feedbackPct    = Math.round((withFeedback / total) * 10) / 10;
-      return { total, withFeedback, noFeedback, ghost, closures, filled, formRejections, feedbackPct };
+      return { total, withFeedback, noFeedback, ghost, active, closures, filled, formRejections, feedbackPct };
     }
 
     function renderStats() {
-      const { total, withFeedback, noFeedback, ghost, closures, filled, formRejections, feedbackPct } = computeStats();
+      const { total, withFeedback, noFeedback, ghost, active, closures, filled, formRejections, feedbackPct } = computeStats();
       document.getElementById('stats-grid').innerHTML = `
         <div class="stat-card">
           <div class="stat-value color-indigo">${total}</div>
@@ -1085,6 +1135,11 @@
           <div class="stat-value color-amber">${closures}</div>
           <div class="stat-label">Role Closures</div>
           <div class="stat-note">${filled} filled &nbsp;·&nbsp; ${formRejections} form rejections</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value color-green">${active}</div>
+          <div class="stat-label">In Progress</div>
+          <div class="stat-note">Active applications, no outcome yet</div>
         </div>
       `;
     }
@@ -1151,10 +1206,12 @@
           </div>
           ${r.type === 'ghost'
             ? `<p class="card-ghost-note">No email received. The application closed without a word.</p>`
-            : `<blockquote class="card-quote">&ldquo;${r.quote}&rdquo;</blockquote>`
+            : r.type === 'active'
+              ? `<p class="card-active-note">${r.activeNote || 'In progress.'}</p>`
+              : `<blockquote class="card-quote">&ldquo;${r.quote}&rdquo;</blockquote>`
           }
           <p class="card-insight">${r.insight}</p>
-          <div class="card-tone">${r.type === 'ghost' ? 'No communication received' : `Email tone: <span>${r.tone}</span>`}</div>
+          <div class="card-tone">${r.type === 'ghost' ? 'No communication received' : r.type === 'active' ? 'Status: <span>In progress</span>' : `Email tone: <span>${r.tone}</span>`}</div>
         </article>
       `).join('');
     }
