@@ -195,6 +195,35 @@
       font-weight: 600;
     }
 
+    /* ---- Flow (Sankey) ---- */
+    .flow-container {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem 2rem 1.25rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+    }
+
+    .flow-scroll svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .flow-note {
+      margin-top: 0.875rem;
+      font-size: 0.78rem;
+      color: var(--text-light);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 640px) {
+      .flow-container { padding: 1.25rem 1rem 1rem; }
+      .flow-scroll { overflow-x: auto; }
+      .flow-scroll svg { min-width: 640px; }
+    }
+
     /* ---- Section header ---- */
     .section-header {
       display: flex;
@@ -630,7 +659,7 @@
       <div class="header-meta">
         <span>28 applications tracked</span>
         <span class="dot"></span>
-        <span>Updated June 7, 2026</span>
+        <span>Updated June 11, 2026</span>
         <span class="dot"></span>
         <span>Technology and operations roles</span>
       </div>
@@ -644,6 +673,17 @@
       <p>Most of the outcomes here were not decisions about a person. Five roles closed before any evaluation took place. Several more were filled by candidates already in process before this search began. That is market timing and volatility, not a skills assessment.</p>
       <p>Three recruiters stood out. <strong>Tracey Kim at Netflix</strong> and <strong>Dan Spencer at Life360</strong> wrote something specific and human when they closed their searches. What they said, how briefly they said it, and what they offered next is the benchmark the rest of the data is measured against. <strong>Lindsay Roberts at Flock Safety</strong> did something different: the first email was a template that referenced an interview that never happened. She sent a correction from her real address. She did not have to. It cost her maybe two minutes.</p>
       <p>Tracking this removes the guesswork. When you can see the patterns clearly, you can stop waiting on the silence and start building your own signal. The search continues.</p>
+    </div>
+
+    <div class="section-header">
+      <span class="section-title">
+        The Flow
+        <span style="font-weight: 500; color: var(--text-muted); font-size: 0.9em;">(every application, start to outcome)</span>
+      </span>
+    </div>
+    <div class="flow-container">
+      <div class="flow-scroll" id="flow-chart"></div>
+      <p class="flow-note" id="flow-note"></p>
     </div>
 
     <div class="section-header">
@@ -694,7 +734,7 @@
           <div class="legend-item"><div class="legend-dot" style="background:#059669;"></div> In Progress (not shown, no outcome date)</div>
         </div>
         <p class="timeline-note">
-          15 entries have no date shown: 2 rejection emails with no recorded date, 11 applications that went silent without sending one, and 2 currently in progress. The undated are the point.
+          13 entries have no date shown: 10 applications that went silent without sending one, and 3 currently in progress. The undated are the point.
         </p>
       </div>
     </div>
@@ -1029,10 +1069,11 @@
         dateDisplay: "June 7, 2026",
         tone: "N/A",
         feedback: false,
-        type: "ghost",
-        typeLabel: "No Response",
+        type: "active",
+        typeLabel: "In Progress",
         quote: null,
-        insight: "Applied June 7. LTE (Limited Term Employment) help desk role supporting 2,000+ clerks and state staff on the WisVote Election Management System. Zendesk-based ticket tracking. On-site, Madison WI. State government position with a nonpartisan requirement. Pending."
+        activeNote: "Applied June 7, 2026. Awaiting first response.",
+        insight: "LTE (Limited Term Employment) help desk role supporting 2,000+ clerks and state staff on the WisVote Election Management System. Zendesk-based ticket tracking. On-site, Madison WI. State government position with a nonpartisan requirement. State hiring moves slowly; no news yet means nothing yet."
       },
       {
         id: 28,
@@ -1234,6 +1275,89 @@
       });
     }
 
+    function renderFlow() {
+      const count   = t => rejections.filter(r => r.type === t).length;
+      const total   = rejections.length;
+      const form    = count('form');
+      const closure = count('closure');
+      const filled  = count('filled');
+      const ghost   = count('ghost');
+      const active  = count('active');
+      const heard   = form + closure + filled;
+
+      const u = 11;        // pixels per application
+      const gap = 22;      // vertical gap between nodes in a column
+      const nodeW = 16;
+      const x1 = 14, x2 = 430, x3 = 800;
+
+      const col1H = total * u;
+      const col2H = (heard + ghost + active) * u + gap * 2;
+      const svgH  = Math.max(col1H, col2H) + 80;
+
+      const col1Y = (svgH - col1H) / 2 + 10;
+      const col2Y = (svgH - col2H) / 2 + 10;
+
+      // Column 2: heard back, no response, in progress (top to bottom)
+      const heardY  = col2Y;
+      const ghostY  = heardY + heard * u + gap;
+      const activeY = ghostY + ghost * u + gap;
+
+      // Column 3 anchored near the heard-back node
+      const formY = Math.max(24, heardY - 8);
+      const closY = formY + form * u + gap;
+      const fillY = closY + closure * u + gap;
+
+      // Source slices on the applications node (same order as column 2)
+      const sHeard  = col1Y;
+      const sGhost  = sHeard + heard * u;
+      const sActive = sGhost + ghost * u;
+
+      // Source slices on the heard-back node (same order as column 3)
+      const hForm = heardY;
+      const hClos = hForm + form * u;
+      const hFill = hClos + closure * u;
+
+      const ribbon = (xa, ya, xb, yb, h, color) => {
+        const mx = (xa + xb) / 2;
+        return `<path d="M ${xa} ${ya} C ${mx} ${ya}, ${mx} ${yb}, ${xb} ${yb} L ${xb} ${yb + h} C ${mx} ${yb + h}, ${mx} ${ya + h}, ${xa} ${ya + h} Z" fill="${color}" opacity="0.28"/>`;
+      };
+      const node = (x, y, h, color) =>
+        `<rect x="${x}" y="${y}" width="${nodeW}" height="${h}" rx="3" fill="${color}"/>`;
+      const label = (x, y, name, n) =>
+        `<text x="${x}" y="${y}" dominant-baseline="middle" font-size="13" font-weight="600" fill="#334155" stroke="#ffffff" stroke-width="4" paint-order="stroke" stroke-linejoin="round">${name} <tspan font-weight="800" fill="#0f172a">${n}</tspan></text>`;
+
+      const svg = `
+        <svg viewBox="0 0 1000 ${svgH}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flow chart of all applications from submission to outcome">
+          ${ribbon(x1 + nodeW, sHeard,  x2, heardY,  heard * u,   '#64748b')}
+          ${ribbon(x1 + nodeW, sGhost,  x2, ghostY,  ghost * u,   '#94a3b8')}
+          ${ribbon(x1 + nodeW, sActive, x2, activeY, active * u,  '#059669')}
+          ${ribbon(x2 + nodeW, hForm,   x3, formY,   form * u,    '#6366f1')}
+          ${ribbon(x2 + nodeW, hClos,   x3, closY,   closure * u, '#d97706')}
+          ${ribbon(x2 + nodeW, hFill,   x3, fillY,   filled * u,  '#7c3aed')}
+          ${node(x1, col1Y, col1H, '#1e293b')}
+          ${node(x2, heardY,  heard * u,  '#64748b')}
+          ${node(x2, ghostY,  ghost * u,  '#94a3b8')}
+          ${node(x2, activeY, active * u, '#059669')}
+          ${node(x3, formY, form * u,    '#6366f1')}
+          ${node(x3, closY, closure * u, '#d97706')}
+          ${node(x3, fillY, filled * u,  '#7c3aed')}
+          ${label(x1, col1Y - 16, 'Applications', total)}
+          ${label(x2 + nodeW + 10, heardY + (heard * u) / 2, 'Heard Back', heard)}
+          ${label(x2 + nodeW + 10, ghostY + (ghost * u) / 2, 'No Response', ghost)}
+          ${label(x2 + nodeW + 10, activeY + (active * u) / 2, 'In Progress', active)}
+          ${label(x3 + nodeW + 10, formY + (form * u) / 2, 'Form Rejection', form)}
+          ${label(x3 + nodeW + 10, closY + (closure * u) / 2, 'Role Closed', closure)}
+          ${label(x3 + nodeW + 10, fillY + (filled * u) / 2, 'Role Filled', filled)}
+        </svg>
+      `;
+
+      document.getElementById('flow-chart').innerHTML = svg;
+      document.getElementById('flow-note').textContent =
+        `Ribbon width is proportional to application count. ${ghost} of ${total} applications flow into silence and stop there; no email was ever sent. ` +
+        `Of the ${heard} that heard back, ${form} were form rejections, ${closure} watched the role close, and ${filled} lost to a candidate already in process. ` +
+        `${active} are still in motion.`;
+    }
+
     function setupInteractions() {
       document.querySelectorAll('.filter-pill').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -1257,6 +1381,7 @@
     }
 
     renderStats();
+    renderFlow();
     renderCards();
     renderTimeline();
     setupInteractions();
