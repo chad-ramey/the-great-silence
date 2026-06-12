@@ -224,6 +224,70 @@
       .flow-scroll svg { min-width: 640px; }
     }
 
+    /* ---- ATS Leaderboard ---- */
+    .ats-container {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem 2rem 1.25rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+    }
+
+    .ats-row {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 1rem;
+      align-items: start;
+      padding: 0.625rem 0;
+    }
+
+    .ats-row + .ats-row {
+      border-top: 1px solid var(--border);
+    }
+
+    .ats-label {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      padding-top: 0.1rem;
+    }
+
+    .ats-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .ats-count {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-muted);
+    }
+
+    .ats-bar {
+      height: 20px;
+      border-radius: 5px;
+      background: #6366f1;
+      opacity: 0.85;
+      min-width: 4px;
+    }
+
+    .ats-row.ats-direct .ats-bar { background: #059669; }
+    .ats-row.ats-direct .ats-name { color: #059669; }
+
+    .ats-companies {
+      font-size: 0.73rem;
+      color: var(--text-light);
+      margin-top: 0.3rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 640px) {
+      .ats-container { padding: 1.25rem 1rem 1rem; }
+      .ats-row { grid-template-columns: 110px 1fr; gap: 0.75rem; }
+    }
+
     /* ---- Section header ---- */
     .section-header {
       display: flex;
@@ -684,6 +748,17 @@
     <div class="flow-container">
       <div class="flow-scroll" id="flow-chart"></div>
       <p class="flow-note" id="flow-note"></p>
+    </div>
+
+    <div class="section-header">
+      <span class="section-title">
+        The Messengers
+        <span style="font-weight: 500; color: var(--text-muted); font-size: 0.9em;">(which systems delivered the news)</span>
+      </span>
+    </div>
+    <div class="ats-container">
+      <div id="ats-rows"></div>
+      <p class="flow-note" id="ats-note"></p>
     </div>
 
     <div class="section-header">
@@ -1358,6 +1433,57 @@
         `${active} are still in motion.`;
     }
 
+    // Delivery platform per outcome email, from the emails themselves.
+    // Keyed by company; only entries that sent an email are looked up.
+    const atsByCompany = {
+      'Anthropic':                     'Gem',
+      'Ashby':                         'Ashby',
+      'Phantom':                       'Ashby',
+      'Monarch Money':                 'Ashby',
+      'Flock Safety':                  'Ashby',
+      'Attentive':                     'Greenhouse',
+      'Life360':                       'Greenhouse',
+      'Aledade':                       'Lever',
+      'Lyra Health':                   'Lever',
+      'CrowdStrike':                   'Workday',
+      'Raven Software':                'Workday',
+      'USPS':                          'Avature',
+      'Netflix':                       'A person\'s own inbox',
+      'CoreWeave':                     'A person\'s own inbox',
+      'Epic':                          'Not recorded'
+    };
+
+    function renderLeaderboard() {
+      const emailed = rejections.filter(r => ['form', 'closure', 'filled'].includes(r.type));
+      const groups = {};
+      emailed.forEach(r => {
+        const key = atsByCompany[r.company] || 'Not recorded';
+        (groups[key] = groups[key] || []).push(r.company);
+      });
+
+      const rows = Object.entries(groups)
+        .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
+      const max = rows[0][1].length;
+
+      document.getElementById('ats-rows').innerHTML = rows.map(([name, companies]) => `
+        <div class="ats-row${name === "A person's own inbox" ? ' ats-direct' : ''}">
+          <div class="ats-label">
+            <span class="ats-name">${name}</span>
+            <span class="ats-count">${companies.length}</span>
+          </div>
+          <div>
+            <div class="ats-bar" style="width: ${(companies.length / max) * 100}%"></div>
+            <div class="ats-companies">${companies.join(' &nbsp;·&nbsp; ')}</div>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('ats-note').textContent =
+        `${emailed.length} of ${rejections.length} applications produced an outcome email. These are the systems that sent them. ` +
+        `The green row is the benchmark: a person, writing from their own address. ` +
+        `The platform at the top has delivered more of this dataset's news than any other, including a thank-you for an interview that never happened.`;
+    }
+
     function setupInteractions() {
       document.querySelectorAll('.filter-pill').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -1382,6 +1508,7 @@
 
     renderStats();
     renderFlow();
+    renderLeaderboard();
     renderCards();
     renderTimeline();
     setupInteractions();
