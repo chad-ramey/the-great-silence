@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="A transparent record of what the job application process looks like from the candidate's side. Every rejection, quoted directly. Every non-answer, counted.">
+  <meta property="og:title" content="The Great Silence: A Rejection Tracker">
+  <meta property="og:description" content="Every application tracked. Every outcome recorded. A transparent record of the job search from the candidate's side.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://chad-ramey.github.io/the-great-silence/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="The Great Silence: A Rejection Tracker">
+  <meta name="twitter:description" content="Every application tracked. Every outcome recorded. A transparent record of the job search from the candidate's side.">
   <title>The Great Silence: A Rejection Tracker</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1350,13 +1357,13 @@
             </div>
           </div>
           ${r.type === 'ghost'
-            ? `<p class="card-ghost-note">No email received. The application closed without a word.</p>`
+            ? `<p class="card-ghost-note">No email received. The application closed without a word.${daysSince(r.id) !== null ? ` <strong>${daysSince(r.id)} days of silence and counting.</strong>` : ''}</p>`
             : r.type === 'active'
               ? `<p class="card-active-note">${r.activeNote || 'In progress.'}</p>`
               : `<blockquote class="card-quote">&ldquo;${r.quote}&rdquo;</blockquote>`
           }
           <p class="card-insight">${r.insight}</p>
-          <div class="card-tone">${r.type === 'ghost' ? 'No communication received' : r.type === 'active' ? 'Status: <span>In progress</span>' : `Email tone: <span>${r.tone}</span>`}</div>
+          <div class="card-tone">${r.type === 'ghost' ? 'No communication received' : r.type === 'active' ? `Status: <span>In progress &middot; Day ${daysSince(r.id) ?? '?'}</span>` : `Email tone: <span>${r.tone}</span>`}</div>
         </article>
       `).join('');
     }
@@ -1486,6 +1493,30 @@
         `Ribbon width is proportional to application count. ${ghost} of ${total} applications flow into silence and stop there; no email was ever sent. ` +
         `Of the ${heard} that heard back, ${form} were form rejections, ${closure} watched the role close, and ${filled} lost to a candidate already in process. ` +
         `${active} are still in motion.`;
+    }
+
+    // Approximate application dates for entries still waiting or never answered.
+    // Keyed by entry id. Used to compute live "days of silence" at page load.
+    const appliedById = {
+      9:  '2026-05-02',   // Pinterest (US Remote)
+      10: '2026-05-09',   // Pinterest (Chicago)
+      11: '2026-04-25',   // Vaco by Highspring
+      12: '2026-05-09',   // Crossing Hurdles
+      13: '2026-05-09',   // Cursor-ASHBY
+      22: '2026-05-24',   // Rec Gen
+      23: '2026-05-17',   // Vanta
+      25: '2026-05-07',   // Netflix (Sys Admin 4)
+      26: '2026-05-24',   // iT1
+      27: '2026-05-24',   // Ethos Life
+      28: '2026-05-24',   // Underdog Fantasy
+      29: '2026-06-07',   // Wisconsin Elections Commission
+      30: '2026-06-09'    // Riot Games
+    };
+
+    function daysSince(id) {
+      if (!appliedById[id]) return null;
+      const applied = new Date(appliedById[id] + 'T12:00:00');
+      return Math.max(0, Math.floor((Date.now() - applied) / 86400000));
     }
 
     // Delivery platform per outcome email, from the emails themselves.
